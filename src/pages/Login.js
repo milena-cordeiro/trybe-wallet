@@ -1,5 +1,8 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import isEmail from 'validator/lib/isEmail';
+import { connect } from 'react-redux';
+import { addEmail } from '../redux/actions';
 
 class Login extends React.Component {
   state = {
@@ -28,6 +31,13 @@ class Login extends React.Component {
     }, this.validateFields);
   };
 
+  handleClick = () => {
+    const { dispatch, history } = this.props;
+    const { email } = this.state;
+    dispatch(addEmail(email));
+    history.push('/carteira');
+  };
+
   render() {
     const { isDisabled } = this.state;
     return (
@@ -45,10 +55,24 @@ class Login extends React.Component {
           data-testid="password-input"
           onChange={ this.handleChange }
         />
-        <button type="button" disabled={ isDisabled }>Entrar</button>
+        <button
+          type="button"
+          disabled={ isDisabled }
+          onClick={ this.handleClick }
+        >
+          Entrar
+
+        </button>
       </div>
     );
   }
 }
 
-export default Login;
+Login.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+};
+
+export default connect()(Login);
