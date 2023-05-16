@@ -21,15 +21,10 @@ class WalletForm extends Component {
     const { dispatch } = this.props;
 
     dispatch(fetchAction());
-    // const { currencies } = this.props;
-    // this.setState({
-    //   currency: currencies[0],
-    // });
   }
 
   handleChange = ({ target }) => {
     const { name, value } = target;
-    // console.log(name, value);
     this.setState({
       [name]: value,
     });
