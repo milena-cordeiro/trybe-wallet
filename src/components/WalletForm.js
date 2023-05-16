@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAction, requestExchangeRates } from '../redux/actions';
+import './WalletForm.css';
 
 const INITIAL_STATE = {
   id: 0,
@@ -45,7 +46,7 @@ class WalletForm extends Component {
     const { currencies } = this.props;
     const { value, description, currency, method, tag } = this.state;
     return (
-      <div>
+      <form>
         <label htmlFor="value">
           Valor:
         </label>
@@ -128,7 +129,7 @@ class WalletForm extends Component {
           Adicionar despesa
 
         </button>
-      </div>
+      </form>
     );
   }
 }

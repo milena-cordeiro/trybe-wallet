@@ -9,10 +9,7 @@ class Wallet extends React.Component {
       <div>
         <Header />
         <br />
-        <fieldset>
-          <legend>Adicione despesas</legend>
-          <WalletForm />
-        </fieldset>
+        <WalletForm />
         <br />
         <Table />
       </div>
