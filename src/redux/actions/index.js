@@ -1,6 +1,9 @@
+// import requestExchangeRates from '../../helpers/request';
+
 // Coloque aqui suas actions
 export const ADD_EMAIL = 'ADD_EMAIL';
 export const ADD_EXPENSES = 'ADD_EXPENSES';
+export const EXCHANGE_RATES = 'EXCHANGE_RATES';
 export const REQUEST_STARTED = 'REQUEST_STARTED';
 export const REQUEST_SUCCESSFUL = 'REQUEST_SUCCESSFUL';
 // export const REQUEST_FAILURE = 'REQUEST_FAILURE';
@@ -35,4 +38,10 @@ export const fetchAction = () => async (dispatch) => {
   newData.splice(1, 1);
   // console.log(newData);
   dispatch(requestSuccesful(newData));
+};
+
+export const requestExchangeRates = (expense) => async (dispatch) => {
+  const response = await fetch(API_URL);
+  const data = await response.json();
+  dispatch(addExpenses({ ...expense, exchangeRates: data }));
 };

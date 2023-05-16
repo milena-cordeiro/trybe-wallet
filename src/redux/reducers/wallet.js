@@ -31,9 +31,7 @@ const walletReducer = (state = INITIAL_STATE_WALLET, action) => {
 
     return {
       ...state,
-      // expenses: [action.payload],
-      expenses: state.expenses.length > 0 ? (
-        [...state.expenses, action.expense]) : ([action.expense]),
+      expenses: [...state.expenses, action.expense],
     };
 
   default:
