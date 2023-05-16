@@ -1,5 +1,6 @@
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
-import { REQUEST_STARTED, REQUEST_SUCCESSFUL, ADD_EXPENSES } from '../actions';
+import { REQUEST_STARTED,
+  REQUEST_SUCCESSFUL, ADD_EXPENSES, REMOVE_EXPENSE } from '../actions';
 // import { ADD_EXPENSES } from '../actions/walletActions';
 
 const INITIAL_STATE_WALLET = {
@@ -32,6 +33,13 @@ const walletReducer = (state = INITIAL_STATE_WALLET, action) => {
     return {
       ...state,
       expenses: [...state.expenses, action.expense],
+    };
+
+  case REMOVE_EXPENSE:
+
+    return {
+      ...state,
+      expenses: [...action.newExpenses],
     };
 
   default:

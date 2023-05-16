@@ -6,6 +6,7 @@ export const ADD_EXPENSES = 'ADD_EXPENSES';
 export const EXCHANGE_RATES = 'EXCHANGE_RATES';
 export const REQUEST_STARTED = 'REQUEST_STARTED';
 export const REQUEST_SUCCESSFUL = 'REQUEST_SUCCESSFUL';
+export const REMOVE_EXPENSE = ' REMOVE_EXPENSE ';
 // export const REQUEST_FAILURE = 'REQUEST_FAILURE';
 
 export const addEmail = (email) => ({
@@ -25,6 +26,11 @@ const requestSuccesful = (data) => ({
 export const addExpenses = (expense) => ({
   type: ADD_EXPENSES,
   expense,
+});
+
+export const removeExpense = (newExpenses) => ({
+  type: REMOVE_EXPENSE,
+  newExpenses,
 });
 
 const API_URL = 'https://economia.awesomeapi.com.br/json/all';
