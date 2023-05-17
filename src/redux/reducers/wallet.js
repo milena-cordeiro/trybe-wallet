@@ -1,6 +1,7 @@
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
 import { REQUEST_STARTED,
-  REQUEST_SUCCESSFUL, ADD_EXPENSES, REMOVE_EXPENSE } from '../actions';
+  REQUEST_SUCCESSFUL,
+  ADD_EXPENSES, REMOVE_EXPENSE, EDIT_EXPENSE, SAVE_EDIT_EXPENSE } from '../actions';
 // import { ADD_EXPENSES } from '../actions/walletActions';
 
 const INITIAL_STATE_WALLET = {
@@ -11,10 +12,9 @@ const INITIAL_STATE_WALLET = {
   idToEdit: 0, // valor numérico que armazena o id da despesa que esta sendo editada
 };
 
-const walletReducer = (state = INITIAL_STATE_WALLET, action) => {
+function walletReducer(state = INITIAL_STATE_WALLET, action) {
   switch (action.type) {
   case REQUEST_STARTED:
-
     return {
       ...state,
       isLoading: true,
@@ -42,9 +42,27 @@ const walletReducer = (state = INITIAL_STATE_WALLET, action) => {
       expenses: [...action.newExpenses],
     };
 
+  case EDIT_EXPENSE:
+
+    return {
+      ...state,
+      idToEdit: action.id,
+      editor: true,
+    };
+
+  case SAVE_EDIT_EXPENSE:
+
+    return {
+      ...state,
+      expenses: state.expenses
+        .map((expense) => (expense.id === action.editedExpense.id
+          ? (action.editedExpense) : (expense))),
+      editor: false,
+    };
+
   default:
     return state;
   }
-};
+}
 
 export default walletReducer;
