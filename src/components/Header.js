@@ -3,10 +3,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 class Header extends Component {
-  // state = {
-  //   currency: 'BRL',
-  // };
-
   somaExpenses = () => {
     const { expenses } = this.props;
 
@@ -26,14 +22,15 @@ class Header extends Component {
             Email:
             {userEmail}
           </p>
-          <p>Despesa Total:</p>
-          <span data-testid="total-field">
-            {this.somaExpenses().toFixed(2)}
-          </span>
-
-          <span data-testid="header-currency-field">
-            BRL
-          </span>
+          <p>
+            Despesa Total:
+            <span data-testid="total-field">
+              {this.somaExpenses().toFixed(2)}
+            </span>
+            <span data-testid="header-currency-field">
+              BRL
+            </span>
+          </p>
         </header>
       </div>
     );
