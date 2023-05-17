@@ -182,7 +182,7 @@ describe('Testa a renderização do componente WalletForm', () => {
     expect(nameCoin).toBeInTheDocument();
   });
 
-  it('se há os botões de excluir e editar e se ao clicar em excluir a tabela é atualizada e os valores de dispesa total também atualiza', async () => {
+  it('se há os botões de excluir e editar e se ao clicar em excluir os valores de despesa total atualizam', async () => {
     const initialEntries = ['/carteira'];
     const { debug } = renderWithRouterAndRedux(<App />, { initialEntries });
 
@@ -209,5 +209,91 @@ describe('Testa a renderização do componente WalletForm', () => {
 
     expect(convertedValue[0]).toHaveTextContent('0.0');
     debug();
+  });
+});
+
+describe('Testa os botões de editar das despesas', () => {
+  it('ao clicar no botão "editar" o botão de "editar despesa" aparece na tela', async () => {
+    const initialEntries = ['/carteira'];
+
+    renderWithRouterAndRedux(<App />, { initialEntries });
+
+    const inputValue = screen.getByLabelText(/valor/i);
+    userEvent.type(inputValue, '11');
+    expect(inputValue.value).toBe('11');
+    const inputDescription = screen.getByRole('textbox', { name: /descreva a despesa:/i });
+    userEvent.type(inputDescription, 'lazer');
+
+    const addBtn = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    act(() => {
+      userEvent.click(addBtn);
+    });
+
+    const convertedValue = await screen.findAllByText(/52\.28/i);
+    expect(convertedValue[1]).toBeInTheDocument();
+    const nameCoin = await screen.findByText('Dólar Americano/Real Brasileiro');
+    expect(nameCoin).toBeInTheDocument();
+    const textDescription = await screen.findByText('lazer');
+    expect(textDescription).toBeDefined();
+
+    const editBtn = screen.getByRole('button', { name: /editar/i });
+
+    act(() => {
+      userEvent.click(editBtn);
+    });
+
+    const saveEditedExpenseBtn = await screen.findByRole('button', { name: /editar despesa/i });
+    expect(saveEditedExpenseBtn).toBeDefined();
+  });
+
+  it('ao clicar no botão de "editar" e fazer alterações e depois salva-las a tabela é atualizada', async () => {
+    const initialEntries = ['/carteira'];
+
+    renderWithRouterAndRedux(<App />, { initialEntries });
+
+    const inputValue = screen.getByLabelText(/valor/i);
+    userEvent.type(inputValue, '11');
+    expect(inputValue.value).toBe('11');
+    const inputDescription = screen.getByRole('textbox', { name: /descreva a despesa:/i });
+    userEvent.type(inputDescription, 'lazer');
+    expect(inputDescription.value).toBe('lazer');
+
+    const addBtn = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    act(() => {
+      userEvent.click(addBtn);
+    });
+
+    const convertedValue = await screen.findAllByText(/52\.28/i);
+    expect(convertedValue[1]).toBeInTheDocument();
+
+    const editBtn = screen.getByRole('button', { name: /editar/i });
+
+    act(() => {
+      userEvent.click(editBtn);
+    });
+
+    userEvent.clear(inputValue);
+    userEvent.type(inputValue, '12');
+    expect(inputValue.value).not.toBe('11');
+    expect(inputValue.value).toBe('12');
+    userEvent.clear(inputDescription);
+    userEvent.type(inputDescription, 'food');
+    expect(inputDescription.value).not.toBe('lazer');
+    expect(inputDescription.value).toBe('food');
+
+    const saveEditedExpenseBtn = await screen.findByRole('button', { name: /editar despesa/i });
+    expect(saveEditedExpenseBtn).toBeDefined();
+
+    act(() => {
+      userEvent.click(saveEditedExpenseBtn);
+    });
+
+    const newConvertedValue = await screen.findAllByText(/57\.04/i);
+    expect(newConvertedValue[1]).toBeInTheDocument();
+    const textDescription = await screen.findByText('food');
+    expect(textDescription).toBeDefined();
+    expect(fetch).toHaveBeenCalled();
   });
 });
