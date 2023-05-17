@@ -1,10 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-// import { act } from 'react-dom/test-utils';
+import { act } from 'react-dom/test-utils';
 import { renderWithRouterAndRedux } from './helpers/renderWith';
 import { App } from '../App';
-// import Header from '../components/Header';
 import mockData from './helpers/mockData';
 
 beforeEach(() => {
@@ -57,25 +56,22 @@ describe('Testa a renderização da página de Login e seus elementos', () => {
     const sendBtn = screen.getByRole('button', { name: 'Entrar' });
     expect(sendBtn.disabled).toBeFalsy();
   });
-  it(
-    'se ao clicar no botão de enviar a página é redirecionada para /carteira',
-    async () => {
-      renderWithRouterAndRedux(<App />);
+  it('se ao clicar no botão de enviar a página é redirecionada para /carteira', () => {
+    renderWithRouterAndRedux(<App />);
 
-      const inputEmail = screen.getByPlaceholderText(/email/i);
-      userEvent.type(inputEmail, 'nome@email.com');
-      const inputPassword = screen.getByPlaceholderText(/senha/i);
-      userEvent.type(inputPassword, '123456');
+    const inputEmail = screen.getByPlaceholderText(/email/i);
+    userEvent.type(inputEmail, 'nome@email.com');
+    const inputPassword = screen.getByPlaceholderText(/senha/i);
+    userEvent.type(inputPassword, '123456');
 
-      const sendBtn = screen.getByRole('button', { name: 'Entrar' });
-      expect(sendBtn.disabled).toBeFalsy();
+    const sendBtn = screen.getByRole('button', { name: 'Entrar' });
+    expect(sendBtn.disabled).toBeFalsy();
 
-      userEvent.click(sendBtn);
+    userEvent.click(sendBtn);
 
-      const walletUser = screen.getByText(/nome@email.com/i);
-      expect(walletUser).toBeInTheDocument();
-    },
-  );
+    const walletUser = screen.getByText(/nome@email.com/i);
+    expect(walletUser).toBeInTheDocument();
+  });
 });
 
 describe('Testa a renderização do componente Header', () => {
@@ -97,22 +93,37 @@ describe('Testa a renderização do componente Header', () => {
     const displayTotalExpense = screen.getByText(/0\.00/i);
     expect(displayEmailUser).toBeInTheDocument();
     expect(displayTotalExpense).toBeInTheDocument();
-
-    expect(fetch).toBeCalledWith('https://economia.awesomeapi.com.br/json/all');
-    expect(fetch).toBeCalled();
-    expect(fetch).toBeCalledTimes(1);
   });
 });
 
 describe('Testa a renderização do componente WalletForm', () => {
-  it('deve renderizar os elementos do WalletForm', () => {
+  it('deve renderizar os elementos do WalletForm e se a API é chamada', () => {
     const initialEntries = ['/carteira'];
+    // const initialState = {
+    //   user: {
+    //     email: 'email@email.com',
+    //   },
+    //   wallet: {
+    //     isLoading: false,
+    //     currencies: [], // array de string
+    //     expenses: [], // array de objetos, com cada objeto tendo as chaves id, value, currency, method, tag, description e exchangeRates
+    //     editor: false, // valor booleano que indica de uma despesa está sendo editada
+    //     idToEdit: 0,
+    //   },
+    // };
     renderWithRouterAndRedux(<App />, { initialEntries });
 
     const walletFormTitle = screen.getByRole('heading', {
       name: /tabela de gastos/i,
     });
     expect(walletFormTitle).toBeInTheDocument();
+
+    expect(fetch).toHaveBeenCalledWith('https://economia.awesomeapi.com.br/json/all');
+    expect(fetch).toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    const addBtn = screen.getByRole('button', { name: 'Adicionar despesa' });
+    expect(addBtn).toBeInTheDocument();
 
     // const inputValue = screen.getByLabelText(/valor/i);
     // const inputMoeda = screen.getByLabelText(/moeda/i);
@@ -124,11 +135,79 @@ describe('Testa a renderização do componente WalletForm', () => {
     // expect(inputPagamento).toBeInTheDocument();
     // expect(inputTag).toBeInTheDocument();
   });
-  // it('se o total de despesa no Header é atualizado', async () => {
-  //   const initialEntries = ['/carteira'];
-  //   renderWithRouterAndRedux(<App />, { initialEntries });
+  it('se o total de despesa no Header é atualizado e no click do botão adicionar a API é chamada', async () => {
+    const initialEntries = ['/carteira'];
+    renderWithRouterAndRedux(<App />, { initialEntries });
 
-  //   const inputValue = screen.getByLabelText(/valor/i);
-  //   const addBtn = screen.getByRole('button', { name: 'Adicionar despesa' });
-  // });
+    const inputValue = screen.getByLabelText(/valor/i);
+    userEvent.type(inputValue, '11');
+    expect(inputValue.value).toBe('11');
+    const addBtn = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    act(() => {
+      userEvent.click(addBtn);
+    });
+
+    const totalExpense = await screen.findAllByText(/52\.28/i);
+    expect(totalExpense[0]).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith('https://economia.awesomeapi.com.br/json/all');
+    expect(fetch).toBeCalledTimes(2);
+  });
+
+  it('se ao adicionar uma despesa a tabela é atualizada', async () => {
+    const initialEntries = ['/carteira'];
+    renderWithRouterAndRedux(<App />, { initialEntries });
+
+    const inputValue = screen.getByLabelText(/valor/i);
+    userEvent.type(inputValue, '11');
+    expect(inputValue.value).toBe('11');
+    // const inputMoeda = screen.getByRole('combobox', { name: /moeda/i });
+    // act(() => {
+    //   userEvent.selectOptions(inputMoeda, ['CAD', 'USD']);
+    // });
+
+    // expect(await screen.getByRole('option', { name: /cad/i }).selected).toBe(true);
+    // expect(await screen.getByRole('option', { name: /usd/i }).selected).toBe(false);
+
+    const addBtn = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    act(() => {
+      userEvent.click(addBtn);
+    });
+
+    const convertedValue = await screen.findAllByText(/52\.28/i);
+    expect(convertedValue[1]).toBeInTheDocument();
+    const nameCoin = await screen.findByText('Dólar Americano/Real Brasileiro');
+    expect(nameCoin).toBeInTheDocument();
+  });
+
+  it('se há os botões de excluir e editar e se ao clicar em excluir a tabela é atualizada e os valores de dispesa total também atualiza', async () => {
+    const initialEntries = ['/carteira'];
+    const { debug } = renderWithRouterAndRedux(<App />, { initialEntries });
+
+    const inputValue = screen.getByLabelText(/valor/i);
+    userEvent.type(inputValue, '12');
+    expect(inputValue.value).toBe('12');
+
+    const addBtn = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    act(() => {
+      userEvent.click(addBtn);
+    });
+
+    const convertedValue = await screen.findAllByText(/57\.04/i);
+    expect(convertedValue[1]).toBeInTheDocument();
+
+    const deleteBtn = await screen.findByRole('button', { name: /excluir/i });
+    const editBtn = await screen.findByRole('button', { name: /editar/i });
+    expect(editBtn).toBeDefined();
+
+    act(() => {
+      userEvent.click(deleteBtn);
+    });
+
+    expect(convertedValue[0]).toHaveTextContent('0.0');
+    debug();
+  });
 });
